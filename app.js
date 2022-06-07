@@ -43,6 +43,26 @@ class UI{
         list.appendChild(row)
     }
 
+    static deleteBook(el) {
+        if(el.classList.contains('delete')){
+            el.parentElement.parentElement.remove()
+        }        
+    }
+
+    static showAlert(message, className) {
+        const div = document.createElement('div')
+        div.className = `alert alert-${className}`
+        div.appendChild(document.createTextNode(message))
+        const container = document.getElementsByClassName('container')
+        const form = document.getElementById('book-form')
+        console.log(div)
+        container[0].insertBefore(div, form)
+
+        setTimeout(() => {
+            div.remove()
+        }, 2000)
+    }
+
     static clearFields() {
         document.getElementById('title').value = ''
         document.getElementById('author').value = ''
@@ -51,6 +71,21 @@ class UI{
 }
 
 // Store Class: Handles Storage
+class Store{
+    static getBooks(){
+        let books
+        if(localStorage.getItem('books') === null){
+            books = []
+        } else{
+            book =  JSON.parse(localStorage.getItem('books'))
+        }
+
+        return books
+    }
+
+    
+}
+
 
 // Event: Display Books
 document.addEventListener('DOMContentLoaded', UI.displayBooks)
@@ -67,12 +102,28 @@ document.getElementById('book-form')
     const author = document.getElementById('author').value
     const isbn   = document.getElementById('isbn').value
 
-    // Instatiate Book
-    const book = new Book(title, author, isbn)
+    // Validate
+    if(title === '' || author === '' || isbn === ''){
+        UI.showAlert('Please fill in all fields', 'info')
+    }else{
+        // Instatiate Book
+        const book = new Book(title, author, isbn)
+        
+        // Add Book to UI
+        UI.addBookToList(book)
 
-    // Add Book to UI
-    UI.addBookToList(book)
+        // Show success message
+        UI.showAlert('Book Added', 'success')
 
-    // Clear fields
-    UI.clearFields()
+        // Clear fields
+        UI.clearFields()
+    }
+})
+
+// Event: Remove a Book
+document.getElementById('book-list').addEventListener('click', (e) => {
+    UI.deleteBook(e.target)
+
+    // Show book remove mess
+    UI.showAlert('Book Remove', 'success')
 })
